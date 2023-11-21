@@ -3,6 +3,7 @@ import dotenv from 'dotenv/config';
 import { promises as fs } from 'fs';
 import { createPost } from './gptPrompt.mjs';
 import { createTag } from './wordpress.mjs';
+import chalk from 'chalk';
 
 // get article from email.txt
 console.log("Reading Article!");
@@ -34,7 +35,6 @@ async function convertTagsToIDs(post) {
   return tagIDs;
 }
 post.tags = await convertTagsToIDs(post);
-
 
 
 const wordPressPost = async () => {
@@ -69,7 +69,7 @@ const wordPressPost = async () => {
 };
 
 wordPressPost().then(post => {
-    console.log("\x33[92mSuccess!\x33[0m!");
+    console.log(chalk.black.bgGreen("Success!"));
 }).catch(error => {
     console.error('Error creating post:', error);
 });
