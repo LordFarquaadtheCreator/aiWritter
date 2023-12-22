@@ -133,3 +133,6 @@ cli
 # Added by cargo
 
 /target
+
+# Added by Fahad
+js/email.txt
