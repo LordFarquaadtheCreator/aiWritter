@@ -7,7 +7,7 @@ use urlencoding::encode;
 use base64::{Engine as _, engine::general_purpose};
 
 #[tokio::main]
-async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
+pub async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
     dotenv().expect("Failed to read .env file");
     let password: String = env::var("PASSWORD").unwrap().to_string(); 
 
@@ -53,13 +53,5 @@ async fn create_tag(wordpress: &reqwest::Client, url: &str, creds: &str, tag: &s
     match create_tag_response_json["id"].as_i64() {
         Some(id) => Ok(id),
         None => Err(create_tag_response.to_string().into()),
-    }
-}
-
-pub fn wordpress() {
-    let result = find_tag("testingfahad123457".to_string());
-    match result {
-        Ok(result) => println!("{}", result),
-        Err(err) => println!("Error: {}", err),
     }
 }
