@@ -1,57 +1,60 @@
 use dotenv::dotenv;
 use std::{env, error::Error};
-use colored::*;
+// use colored::*;
 use reqwest;
 use base64;
+use urlencoding::encode;
+use base64::{Engine as _, engine::general_purpose};
 
 #[tokio::main]
-async fn create_tag(tag: String) -> Result<String, Box<dyn Error>> {
-    let password = env::var("PASSWORD")?; // Handle potential error
-    let url = "https://rightondigital.com/wp-json/wp/v2/tags";
-    let creds = format!("fahadfaruqi1@gmail.com:{}", password);
-    let encoded_creds = base64::encode(creds); // Basic Auth requires Base64 encoding
+async fn create_tag(tag: String, url: String, creds: String) -> Result<i64, Box<dyn Error>> {
+    let body = format!("{{\"name\":\"{}\"}}", tag);
 
-    // query wordpress for all avaliable tags
     let wordpress: reqwest::Client = reqwest::Client::new();
-    let response = wordpress.post(url)
-        .query(&[("search", &tag)])
-        .header("Authorization", format!("Basic {}", encoded_creds))
+    let create_tag_response: reqwest::Response = wordpress.post(url)
+        .header("Authorization", format!("Basic {}", &creds))
+        .body(body)
         .send()
         .await?;
 
-
-    let existingTags: String = response.text();
-    println!("{}", existingTags);
-
-    // Do something with `body` or return a meaningful result
-    Ok(true);
+    let create_tag_response: String = create_tag_response.text().await?;
+    let create_tag_response: serde_json::Value = serde_json::from_str(&create_tag_response)?;
+    match create_tag_response[0]["id"].as_i64() {
+        Some(id) => Ok(id),
+        None => Err("Something went wrong".into()),
+    }
 }
-//   const existingTags = await existingTagResponse.json();
+#[tokio::main]
+async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
+    dotenv().expect("Failed to read .env file");
+    let password: String = env::var("PASSWORD").unwrap().to_string(); 
 
-//   // If the tag exists, return the existing ID
-//   if (existingTags && existingTags.length > 0) {
-//     return existingTags[0].id;
-//   }
+    let url = format!("https://rightondigital.com/wp-json/wp/v2/tags?search={}", encode(&tag));
+    let creds = general_purpose::STANDARD.encode(format!("fahadfaruqi1@gmail.com:{}", password));
 
-//   // Tag does not exist, create a new one
-//   const createTagResponse = await fetch(url, {
-//     method: 'POST',
-//     headers: {
-//       'Content-Type': 'application/json',
-//       'Authorization': `Basic ${credentials}`
-//     },
-//     body: JSON.stringify({ name: name }) // "name" is the only required field to create a tag
-//   });
+    // query wordpress for all avaliable tags
+    let wordpress: reqwest::Client = reqwest::Client::new();
+    let existing_tag_response: reqwest::Response = wordpress.get(&url)
+        .header("Authorization", format!("Basic {}", &creds))
+        .send()
+        .await?;
+    let existing_tag: String = existing_tag_response.text().await?;
+    let existing_tags: serde_json::Value = serde_json::from_str(&existing_tag)?;
+    print!("{}\n", existing_tags[0]);
 
-//   if (!createTagResponse.ok) {
-//     throw new Error(`HTTP error when creating tag! status: ${createTagResponse.status}`);
-//   }
+    if existing_tags=="[]" { // we must create a new tag
+        Ok(create_tag(tag, url, creds)?)
+    } else{ // return tag's ID
+        let first_tag_id = existing_tags[0]["id"].as_i64().unwrap();
+        Ok(first_tag_id)
+    }
+}
 
-//   const newTag = await createTagResponse.json();
-//   return newTag.id; // Returns the new tag ID
-
-pub fn main(){
-    dotenv().ok();
-    create_tag("drake".to_string());
-    println!("{}", "Wordpress".green());
+pub fn wordpress(){
+    let result = find_tag("gambino".to_string());
+    match result {
+        Ok(result) => println!("{}", result),
+        Err(err) => println!("Error: {}", err),
+    }
+    // println!("{}", "Called wordpress function".green());
 }

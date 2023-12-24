@@ -4,7 +4,7 @@ import { promises as fs } from 'fs';
 
 export async function createTag(name) {
   const url = 'https://rightondigital.com/wp-json/wp/v2/tags';
-    const credentials = Buffer.from('fahadfaruqi1@gmail.com:' + process.env.PASSWORD).toString('base64');
+  const credentials = Buffer.from('fahadfaruqi1@gmail.com:' + process.env.PASSWORD).toString('base64');
 
   // First, try to retrieve the tag by name to see if it already exists
   const existingTagResponse = await fetch(`${url}?search=${encodeURIComponent(name)}`, {
