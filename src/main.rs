@@ -1,11 +1,14 @@
 mod gpt_prompt;
 use gpt_prompt::gpt_prompt;
 use gpt_prompt::GPTPrompt;
-// mod wordpress;
-// use wordpress::find_tag;
-// use std::error::Error;
 
-fn main (){
+mod wordpress;
+use wordpress::find_tag;
+use wordpress::post;
+use std::error::Error;
+
+#[tokio::main]
+async fn main (){
     // create post text
     let content_result = gpt_prompt();
     let content: GPTPrompt = match content_result {
@@ -16,22 +19,32 @@ fn main (){
         }
     };
 
-    println!("{}", content.title);
-
     // iteratively create & store tags to be used in post
+    let tags: Result<Vec<i64>, Box<dyn Error>> = content.tags.iter().map(|tag: &String| {
+        let tag_result: Result<i64, Box<dyn Error>> = find_tag(tag.to_string());
+        let tag_id: i64 = tag_result?; // Propagate the error if there is one
+        Ok(tag_id)
+    }).collect();
+    let tags: Vec<i64> = match tags {
+        Ok(tags) => tags,
+        Err(err) => {
+            eprintln!("Error: {}", err);
+            return;
+        }
+    };
 
-    // let tag_array: Vec<str> = vec![];
-
-    // let result = find_tag("kendrick lamar".to_string());
+    // create post
+    let post = post(content, tags).await;
+    let post: bool = match post {
+        Ok(post) => post,
+        Err(err) => {
+            eprintln!("Error: {}", err);
+            return;
+        }
+    };
+    if post {
+        println!("Success!");
+    } else {
+        println!("Failed to create post");
+    }
 }
-// async function convertTagsToIDs(post) {
-//   if (!post.tags || !Array.isArray(post.tags)) {
-//     throw new Error('No tags array found or the tags property is not an array.');
-//   }
-
-//   const tagPromises = post.tags.map(tagName => createTag(tagName));
-//   const tagIDs = await Promise.all(tagPromises);
-
-//   return tagIDs;
-// }
-// post.tags = await convertTagsToIDs(post);

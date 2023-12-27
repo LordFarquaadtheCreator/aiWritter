@@ -5,6 +5,20 @@ use reqwest;
 use base64;
 use urlencoding::encode;
 use base64::{Engine as _, engine::general_purpose};
+use serde::{Serialize, Deserialize};
+
+use crate::GPTPrompt;
+
+#[derive(Serialize, Deserialize)]
+
+struct PostData{
+    title: String,
+    excerpt: String,
+    content: String,
+    status: String,
+    categories: Vec<i64>,
+    tags: Vec<i64>,
+}
 
 #[tokio::main]
 pub async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
@@ -55,3 +69,51 @@ async fn create_tag(wordpress: &reqwest::Client, url: &str, creds: &str, tag: &s
         None => Err(create_tag_response.to_string().into()),
     }
 }
+
+pub async fn post(content: GPTPrompt, tags: Vec<i64>) -> Result<bool, Box<dyn Error>> {
+    dotenv().expect("Failed to read .env file");
+    let url = "https://rightondigital.com/wp-json/wp/v2/posts";
+    let password: String = env::var("PASSWORD").unwrap().to_string();
+    let creds = general_purpose::STANDARD.encode(format!("fahadfaruqi1@gmail.com:{}", password));
+
+    // convert post data into an object just to enforce structure
+    let post_data = PostData{
+        title: content.title,
+        excerpt: content.excerpt,
+        content: content.content,
+        status: "draft".to_string(),
+        categories: content.categories,
+        tags: tags
+    };
+    // convert post data into a string
+    let post_data_string = serde_json::to_string(&post_data)?;
+
+
+    let wordpress: reqwest::Client = reqwest::Client::new();
+    let submit_to_wordpress: reqwest::Response = wordpress.get(url)
+        .header("Authorization", format!("Basic {}", &creds))
+        .body(post_data_string)
+        .send()
+        .await?;
+    let wordpress_response: String = submit_to_wordpress.text().await?;
+    println!("{}", wordpress_response);
+    Ok(true)
+}
+//     const response = await fetch(url, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json',
+//             'Authorization': `Basic ${credentials}`
+//         },
+//         body: JSON.stringify(postData)
+//     });
+
+//     if (!response.ok) {
+//         const message = `An error has occurred: ${response.status}`;
+//         throw new Error(message);
+//     }
+
+//     const postResponse = await response.json();
+//     return postResponse;
+// };
+
