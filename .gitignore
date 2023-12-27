@@ -138,3 +138,4 @@ cli
 js/email.txt
 src/email.txt
 src/gpt_prompt.txt
+src/gpt_response.json
