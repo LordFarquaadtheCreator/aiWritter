@@ -24,8 +24,7 @@ fn read_file(file_path:String) -> io::Result<String> {
     Ok(content)
 }
 
-/// prompts gpt with email content
-pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
+fn generate_response() -> Result<chat_completion::ChatCompletionResponse, Box<dyn std::error::Error>> {
     // set up variables & client
     dotenv().ok();
     let openai_api_key = env::var("OPENAI_API_KEY").unwrap();
@@ -63,9 +62,13 @@ pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
     // send request
     let result: chat_completion::ChatCompletionResponse = client.chat_completion(req)?;
     println!("{}", "Prompting Done!".blue());
+    
+    Ok(result)
+}
 
+fn parse_reponse (gpt_reponse: chat_completion::ChatCompletionResponse) -> Result<GPTPrompt, Box<dyn std::error::Error>> {
     // parse response
-    let gpt_result: String = result.choices.get(0).and_then(|choice| choice.message.content.clone()).unwrap_or("".to_string());
+    let gpt_result: String = gpt_reponse.choices.get(0).and_then(|choice| choice.message.content.clone()).unwrap_or("".to_string());
     let gpt_body: serde_json::Value = serde_json::from_str(&gpt_result)?;
 
     // save response to text file for debugging
@@ -73,8 +76,7 @@ pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
     let mut file = File::create("./gpt_response.json")?;
     file.write_all(&gpt_body_string.as_bytes())?;
     println!("{}", "Saved reponse to JSON".bold());
-
-    // parse response into GPTPrompt struct
+    
     let tags: Result<Vec<String>, _> = gpt_body["tags"].as_array()
         .ok_or("Expected an array")?
         .iter()
@@ -94,6 +96,26 @@ pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
         categories: categories?,
         excerpt: gpt_body["excerpt"].to_string(),
     };
+
+    Ok(response)
+}
+
+/// prompts gpt with email content
+pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
+    // prompt gpt
+    let gpt_response: Result<chat_completion::ChatCompletionResponse, Box<dyn std::error::Error>> = generate_response();
+    let gpt_body: chat_completion::ChatCompletionResponse = match gpt_response {
+        Ok(body) => body,
+        Err(err) => return Err(err),
+    };
+
+    // parse response into GPTPrompt struct
+    let response_result: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);
+    let response: GPTPrompt = match response_result {
+        Ok(response) => response,
+        Err(err) => return Err(err),
+    };
+    
     // return result
     Ok(response)
 }
