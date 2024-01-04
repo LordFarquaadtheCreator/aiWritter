@@ -1,7 +1,9 @@
 // unofficial rust wrapper for openai api
 use openai_api_rs::v1::api::Client;
 use openai_api_rs::v1::chat_completion::{self, ChatCompletionRequest};
-use openai_api_rs::v1::common::GPT4;
+use reqwest::header::CONTENT_TYPE;
+use serde_json::json;
+// use openai_api_rs::v1::common::GPT4;
 use std::env;
 use std::fs;
 use std::io::{self};
@@ -9,7 +11,11 @@ use dotenv::dotenv;
 use colored::*;
 use std::fs::File;
 use std::io::prelude::*;
+use regex::Regex;
+use serde::{Serialize, Deserialize};
+use reqwest::header::{HeaderMap, AUTHORIZATION};
 
+#[derive(Debug, Serialize, Deserialize)]
 pub struct GPTPrompt {
     pub title: String,
     pub content: String,
@@ -18,64 +24,80 @@ pub struct GPTPrompt {
     pub excerpt: String,
 }
 
+// save to txt
+fn save_to_txt (content: String, extra: String) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = File::create(format!("./gpt_response_{extra}.json"))?;
+    let _ = file.write_all(content.as_bytes())?;
+    println!("{}", "Saved response to JSON file".bold());
+    Ok(())
+}
+
 // reads & returns content of files
 fn read_file(file_path:String) -> io::Result<String> {
     let content: String = fs::read_to_string(file_path)?;
     Ok(content)
 }
 
-fn generate_response() -> Result<chat_completion::ChatCompletionResponse, Box<dyn std::error::Error>> {
+// prompts gpt with email content
+async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     // set up variables & client
     dotenv().ok();
     let openai_api_key = env::var("OPENAI_API_KEY").unwrap();
-    let client = Client::new(openai_api_key);
-    
-    let email_content = read_file("./email.txt".to_string()).map_err(|_| "Failed to get email content")?;
+    let url = "https://api.openai.com/v1/chat/completions".to_string();
+    let email_content: String = read_file("./email.txt".to_string()).map_err(|_| "Failed to get email content")?;
     let gpt_prompt = read_file("./gpt_prompt.txt".to_string()).map_err(|_| "Failed to get gpt prompt content")?;
 
-    if email_content.trim().is_empty() {
-        return Err("Email content is empty!".into());
+    if email_content.trim().is_empty() || gpt_prompt.trim().is_empty(){
+        return Err("Email or gpt prompt content is empty!".into());
     }
 
-    println!("{}", "Prompting GPT...".green());
-    // set up request
-    let req: ChatCompletionRequest = ChatCompletionRequest::new(
-        GPT4.to_string(),
-        vec![chat_completion::ChatCompletionMessage {
-            name: None,
-            function_call: None,
+    // send request to openai
+    let client = reqwest::Client::new();
 
-            // The AI's role defined
-            role: chat_completion::MessageRole::system,
-            content: String::from(gpt_prompt),
-        }, chat_completion::ChatCompletionMessage{
-            name: None,
-            function_call: None,
+    let mut headers = HeaderMap::new();
+    headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
+    headers.insert(AUTHORIZATION, format!("Bearer {}", openai_api_key).parse().unwrap());
 
-            // The prompt to generate a completion for
-            role: chat_completion::MessageRole::user,
-            content: email_content,
+    let request_data = json!({
+        "model": "gpt-3.5-turbo-1106",
+        "messages": [
+            {
+                "role": "system",
+                "content": gpt_prompt
+            },
+            {
+                "role": "user",
+                "content": email_content
             }
-        ]
-    );
+        ],
+        "response_format": { "type": "json_object" },
+        "temperature": 0
+    });
 
-    // send request
-    let result: chat_completion::ChatCompletionResponse = client.chat_completion(req)?;
+    println!("{}", "Prompting GPT...".green());
+    let response = client.post(url)
+        .headers(headers)
+        .body(request_data.to_string())
+        .send()
+        .await?
+        .text()
+        .await?;
+
+    let jresponse: serde_json::Value = serde_json::from_str(&response)?;
+    let completion = jresponse["choices"][0]["message"]["content"].as_str().unwrap_or("");
+    let _ = save_to_txt(completion.to_string(), "".to_string());
     println!("{}", "Prompting Done!".blue());
-    
-    Ok(result)
+
+    // convert response to string & return
+    Ok(completion.to_string())
 }
 
-fn parse_reponse (gpt_reponse: chat_completion::ChatCompletionResponse) -> Result<GPTPrompt, Box<dyn std::error::Error>> {
-    // parse response
-    let gpt_result: String = gpt_reponse.choices.get(0).and_then(|choice| choice.message.content.clone()).unwrap_or("".to_string());
-    let gpt_body: serde_json::Value = serde_json::from_str(&gpt_result)?;
+// convert ChatCompletionResponse into GPTPrompt struct
+fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::Error>> {
+    // convert to json
+    println!("Converting to json");
+    let gpt_body: serde_json::Value = serde_json::from_str(&gpt_reponse)?;
 
-    // save response to text file for debugging
-    let gpt_body_string = serde_json::to_string(&gpt_body).unwrap();
-    let mut file = File::create("./gpt_response.json")?;
-    file.write_all(&gpt_body_string.as_bytes())?;
-    println!("{}", "Saved reponse to JSON".bold());
     
     let tags: Result<Vec<String>, _> = gpt_body["tags"].as_array()
         .ok_or("Expected an array")?
@@ -92,28 +114,31 @@ fn parse_reponse (gpt_reponse: chat_completion::ChatCompletionResponse) -> Resul
     let response: GPTPrompt = GPTPrompt{
         title: gpt_body["title"].to_string(),
         content: gpt_body["content"].to_string(),
-        tags: tags?,
-        categories: categories?,
+        tags: tags.unwrap(),
+        categories: categories.unwrap(),
         excerpt: gpt_body["excerpt"].to_string(),
     };
+    println!("Saved response to GPTPrompt body");
+    let _ = save_to_txt(serde_json::to_string(&gpt_body).unwrap(), "test".to_string());
 
     Ok(response)
 }
 
 /// prompts gpt with email content
-pub fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
+pub async fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
     // prompt gpt
-    let gpt_response: Result<chat_completion::ChatCompletionResponse, Box<dyn std::error::Error>> = generate_response();
-    let gpt_body: chat_completion::ChatCompletionResponse = match gpt_response {
+    let gpt_response: Result<String, Box<dyn std::error::Error>> = generate_response().await;
+    let gpt_body: String = match gpt_response {
         Ok(body) => body,
-        Err(err) => return Err(err),
-    };
+        Err(err) => return Err(format!("Error prompting GPT: {}", err).into()),    
+    };    
+    // let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
 
     // parse response into GPTPrompt struct
-    let response_result: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);
-    let response: GPTPrompt = match response_result {
+    let gpt_reponse: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);    
+    let response: GPTPrompt = match gpt_reponse {
         Ok(response) => response,
-        Err(err) => return Err(err),
+        Err(err) => return Err(format!("Error converting GPT response into GPTbody\n {}", err).into()),
     };
     
     // return result
