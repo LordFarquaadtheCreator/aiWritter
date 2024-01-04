@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 import dotenv from 'dotenv/config';
 import { promises as fs } from 'fs';
+import axios from 'axios';
 
 export async function createTag(name) {
   const url = 'https://rightondigital.com/wp-json/wp/v2/tags';
@@ -26,13 +27,11 @@ export async function createTag(name) {
   }
 
   // Tag does not exist, create a new one
-  const createTagResponse = await fetch(url, {
-    method: 'POST',
+  const createTagResponse = await axios.post(url, { name: name }, {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Basic ${credentials}`
-    },
-    body: JSON.stringify({ name: name }) // "name" is the only required field to create a tag
+    }
   });
 
   if (!createTagResponse.ok) {

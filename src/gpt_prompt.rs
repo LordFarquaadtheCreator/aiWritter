@@ -1,9 +1,4 @@
-// unofficial rust wrapper for openai api
-use openai_api_rs::v1::api::Client;
-use openai_api_rs::v1::chat_completion::{self, ChatCompletionRequest};
-use reqwest::header::CONTENT_TYPE;
 use serde_json::json;
-// use openai_api_rs::v1::common::GPT4;
 use std::env;
 use std::fs;
 use std::io::{self};
@@ -11,9 +6,8 @@ use dotenv::dotenv;
 use colored::*;
 use std::fs::File;
 use std::io::prelude::*;
-use regex::Regex;
 use serde::{Serialize, Deserialize};
-use reqwest::header::{HeaderMap, AUTHORIZATION};
+use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GPTPrompt {
@@ -97,7 +91,7 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
     // convert to json
     println!("Converting to json");
     let gpt_body: serde_json::Value = serde_json::from_str(&gpt_reponse)?;
-
+    // println!("{:#?}", gpt_body);
     
     let tags: Result<Vec<String>, _> = gpt_body["tags"].as_array()
         .ok_or("Expected an array")?
@@ -112,14 +106,14 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
         .collect();
 
     let response: GPTPrompt = GPTPrompt{
-        title: gpt_body["title"].to_string(),
-        content: gpt_body["content"].to_string(),
+        title: gpt_body["title"].as_str().unwrap().to_string(),
+        content: gpt_body["content"].as_str().unwrap().to_string(),
         tags: tags.unwrap(),
         categories: categories.unwrap(),
-        excerpt: gpt_body["excerpt"].to_string(),
+        excerpt: gpt_body["excerpt"].as_str().unwrap().to_string(),
     };
     println!("Saved response to GPTPrompt body");
-    let _ = save_to_txt(serde_json::to_string(&gpt_body).unwrap(), "test".to_string());
+    let _ = save_to_txt(serde_json::to_string(&response).unwrap(), "test".to_string());
 
     Ok(response)
 }
@@ -132,7 +126,7 @@ pub async fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
         Ok(body) => body,
         Err(err) => return Err(format!("Error prompting GPT: {}", err).into()),    
     };    
-    // let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
+    let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
 
     // parse response into GPTPrompt struct
     let gpt_reponse: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);    

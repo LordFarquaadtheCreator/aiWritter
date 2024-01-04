@@ -9,8 +9,8 @@ use serde::{Serialize, Deserialize};
 
 use crate::GPTPrompt;
 
-#[derive(Serialize, Deserialize)]
-
+// allows us to convert to string
+#[derive(Serialize, Deserialize, Debug)]
 struct PostData{
     title: String,
     excerpt: String,
@@ -20,7 +20,7 @@ struct PostData{
     tags: Vec<i64>,
 }
 
-#[tokio::main]
+/// returns tag's ID if it exists
 pub async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
     dotenv().expect("Failed to read .env file");
     let password: String = env::var("PASSWORD").unwrap().to_string(); 
@@ -42,7 +42,7 @@ pub async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
         let result = create_tag(&wordpress, &url, &creds, &tag).await;
         match result {
             Ok(result) => Ok(result),
-            Err(err) => Err(err),
+            Err(err) => Err(format!("Error creating tag for {tag}.\n{err}").into()),
         }
     } else { // array not empty so return tag's ID
         match existing_tags[0]["id"].as_i64() {
@@ -52,6 +52,8 @@ pub async fn find_tag(tag: String) -> Result<i64, Box<dyn Error>> {
     }
 }
 
+/// creates a new tag in wordpress
+/// returns tag's ID
 async fn create_tag(wordpress: &reqwest::Client, url: &str, creds: &str, tag: &str,) -> Result<i64, Box<dyn std::error::Error>> {
     let body = format!("{{\"name\":\"{}\"}}", tag);
     let create_tag_response: reqwest::Response = wordpress.post(url)
@@ -70,11 +72,13 @@ async fn create_tag(wordpress: &reqwest::Client, url: &str, creds: &str, tag: &s
     }
 }
 
-pub async fn post(content: GPTPrompt, tags: Vec<i64>) -> Result<bool, Box<dyn Error>> {
+/// returns status code of post request
+pub async fn post(content: GPTPrompt, tags: Vec<i64>) -> Result<u16, Box<dyn Error>> {
     dotenv().expect("Failed to read .env file");
     let url = "https://rightondigital.com/wp-json/wp/v2/posts";
     let password: String = env::var("PASSWORD").unwrap().to_string();
     let creds = general_purpose::STANDARD.encode(format!("fahadfaruqi1@gmail.com:{}", password));
+    // println!("{:#?}", content);
 
     // convert post data into an object just to enforce structure
     let post_data = PostData{
@@ -85,35 +89,19 @@ pub async fn post(content: GPTPrompt, tags: Vec<i64>) -> Result<bool, Box<dyn Er
         categories: content.categories,
         tags: tags
     };
-    // convert post data into a string
-    let post_data_string = serde_json::to_string(&post_data)?;
+    // println!("{:#?}", post_data);
 
-
+    // using the .json 
     let wordpress: reqwest::Client = reqwest::Client::new();
-    let submit_to_wordpress: reqwest::Response = wordpress.get(url)
+    let submit_to_wordpress: reqwest::Response = wordpress.post(url)
         .header("Authorization", format!("Basic {}", &creds))
-        .body(post_data_string)
+        .header("Content-Type", "application/json")
+        // .body(post_data_string)
+        .json(&post_data)
         .send()
         .await?;
-    let wordpress_response: String = submit_to_wordpress.text().await?;
-    println!("{}", wordpress_response);
-    Ok(true)
+
+    // let wordpress_response: String = submit_to_wordpress.text().await?;
+    // println!("{}", wordpress_response);
+    Ok(submit_to_wordpress.status().as_u16())
 }
-//     const response = await fetch(url, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//             'Authorization': `Basic ${credentials}`
-//         },
-//         body: JSON.stringify(postData)
-//     });
-
-//     if (!response.ok) {
-//         const message = `An error has occurred: ${response.status}`;
-//         throw new Error(message);
-//     }
-
-//     const postResponse = await response.json();
-//     return postResponse;
-// };
-
