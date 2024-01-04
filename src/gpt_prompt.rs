@@ -126,7 +126,7 @@ pub async fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
         Ok(body) => body,
         Err(err) => return Err(format!("Error prompting GPT: {}", err).into()),    
     };    
-    let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
+    // let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
 
     // parse response into GPTPrompt struct
     let gpt_reponse: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);    

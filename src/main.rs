@@ -26,7 +26,14 @@ async fn main (){
     // iteratively create & store tags to be used in post
     let tag_futures: Vec<_> = content.tags.iter().map(|tag: &String| async {
         let tag_result = find_tag(tag.to_string()).await;
-        let tag_id: i64 = tag_result?; // Propagate the error if there is one
+        
+        let tag_id: i64 = match tag_result {
+            Ok(id) => id,
+            Err(err) => {
+                eprintln!("Error: {}", err);
+                return Err(err);
+            }
+        };
         Ok(tag_id)
     }).collect();
 
@@ -48,6 +55,6 @@ async fn main (){
             return;
         }
     };
-    if post > 200 && post < 400 {println!("Success!");} 
+    if (200..400).contains(&post) {println!("Success!");} 
     else {println!("Failed to create post");}
 }
