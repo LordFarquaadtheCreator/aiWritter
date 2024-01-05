@@ -12,7 +12,7 @@ async function createContainer(photoUrl, hashtags){
         const response = await axios.post(url); // no error handling
         // console.log(response);
         postId = response.data.id;
-        console.log('Post ID:', postId);
+        // console.log('Post ID:', postId);
     } catch (error) {
         console.error('Error:', error.message);
     }
