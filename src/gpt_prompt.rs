@@ -93,6 +93,7 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
     let gpt_body: serde_json::Value = serde_json::from_str(&gpt_reponse)?;
     // println!("{:#?}", gpt_body);
     
+    // ensuring that vectors are vectors of strings
     let tags: Result<Vec<String>, _> = gpt_body["tags"].as_array()
         .ok_or("Expected an array")?
         .iter()
@@ -113,14 +114,14 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
         excerpt: gpt_body["excerpt"].as_str().unwrap().to_string(),
     };
     println!("Saved response to GPTPrompt body");
-    let _ = save_to_txt(serde_json::to_string(&response).unwrap(), "test".to_string());
+    let _ = save_to_txt(serde_json::to_string(&response).unwrap(), "formatted".to_string());
 
     Ok(response)
 }
 
 /// prompts gpt with email content
 pub async fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
-    // prompt gpt
+    // prompts gpt & returns response in string
     let gpt_response: Result<String, Box<dyn std::error::Error>> = generate_response().await;
     let gpt_body: String = match gpt_response {
         Ok(body) => body,

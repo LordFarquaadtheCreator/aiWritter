@@ -1,5 +1,5 @@
 import axios from 'axios';
-import dotenv from 'dotenv/config'; // though it may be grayed out, it is needed
+import dotenv from 'dotenv/config'; // though it may be grayed out, it used
 
 export async function getHash(query){
   const options = {

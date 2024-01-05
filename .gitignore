@@ -139,4 +139,4 @@ js/email.txt
 src/email.txt
 src/gpt_prompt.txt
 src/gpt_response_.json
-src/gpt_response_test.json
+src/gpt_response_formatted.json
