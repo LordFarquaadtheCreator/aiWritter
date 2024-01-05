@@ -136,6 +136,7 @@ cli
 
 # Added by Fahad
 js/email.txt
+js/hashtags.txt
 src/email.txt
 src/gpt_prompt.txt
 src/gpt_response_.json

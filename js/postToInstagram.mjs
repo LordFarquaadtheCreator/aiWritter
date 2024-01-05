@@ -1,5 +1,13 @@
 import axios from 'axios';
 import dotenv from 'dotenv/config';
+import fs from 'fs';
+import path from 'path';
+
+function readFile(fileName){
+    // const filePath = path.join(__dirname, fileName);
+    const data = fs.readFileSync(`./${fileName}`, 'utf-8');
+    return data;
+}
 
 async function createContainer(photoUrl, hashtags){
     const caption = encodeURIComponent(`Yeah we did that! Check this out and more with the link in bio!\n.\n.\n.\n${hashtags}`);
@@ -14,7 +22,7 @@ async function createContainer(photoUrl, hashtags){
         postId = response.data.id;
         // console.log('Post ID:', postId);
     } catch (error) {
-        console.error('Error:', error.message);
+        console.error('Error:', error);
     }
     return postId;
 };
@@ -50,4 +58,10 @@ async function postToInstagram(photoUrl, hashtags){
 
     return success;
 }
-await postToInstagram("https://i.imgur.com/mri8rbf.png", "#christmas")
+const args = process.argv.slice(2);
+const photoUrl = args[0];
+if(!photoUrl) {
+    console.log("No photo url provided - first arg pls");
+    process.exit();
+}
+await postToInstagram(photoUrl, readFile('hashtags.txt'))
