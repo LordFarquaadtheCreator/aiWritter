@@ -4,7 +4,6 @@ import fs from 'fs';
 import path from 'path';
 
 function readFile(fileName){
-    // const filePath = path.join(__dirname, fileName);
     const data = fs.readFileSync(`./${fileName}`, 'utf-8');
     return data;
 }
