@@ -1,13 +1,11 @@
 import axios from 'axios';
 import dotenv from 'dotenv/config';
 import fs from 'fs';
-import path from 'path';
 
 function readFile(fileName){
     const data = fs.readFileSync(`./${fileName}`, 'utf-8');
     return data;
-}
-
+};
 async function createContainer(photoUrl, hashtags){
     const caption = encodeURIComponent(`Yeah we did that! Check this out and more with the link in bio!\n.\n.\n.\n${hashtags}`);
     const userId = process.env.GRAPH_USER_ID;
