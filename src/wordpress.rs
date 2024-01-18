@@ -1,11 +1,12 @@
 use dotenv::dotenv;
 use std::{env, error::Error};
 // use colored::*;
-use reqwest;
+use reqwest::{self, header::{ACCEPT, CONTENT_TYPE, AUTHORIZATION, CONTENT_DISPOSITION}};
 use base64;
 use urlencoding::encode;
 use base64::{Engine as _, engine::general_purpose};
 use serde::{Serialize, Deserialize};
+use reqwest::blocking::get;
 
 use crate::GPTPrompt;
 
@@ -70,6 +71,32 @@ async fn create_tag(wordpress: &reqwest::Client, url: &str, creds: &str, tag: &s
         Some(id) => Ok(id),
         None => Err(create_tag_response.to_string().into()),
     }
+}
+
+/// posts image to wordpress,
+/// returns image id
+pub async fn post_image(image_path: String) -> Result<String, Box<dyn Error>>{
+    let img = get(image_path).expect("Failed to get image");
+    let img_bytes = img.bytes().expect("Failed to convert response into bytes");
+    
+    let url = "https://rightondigital.com/wp-json/wp/v2/posts";
+    let password: String = env::var("PASSWORD").unwrap().to_string();
+    let creds = general_purpose::STANDARD.encode(format!("fahadfaruqi1@gmail.com:{}", password));
+
+    let wordpress: reqwest::Client = reqwest::Client::new();
+    let post_image: reqwest::Response = wordpress.post(url)
+    .header(AUTHORIZATION, format!("Basic {}", &creds))
+    .header(CONTENT_TYPE, "image/jpeg")
+    .header(ACCEPT, "application/json")
+    .header(CONTENT_DISPOSITION, "attachment; filename=img.jpg")
+    .body(img_bytes)
+    .send()
+    .await?;
+
+    let wordpress_response: String = post_image.text().await?;
+    println!("{}", wordpress_response);
+
+    Ok(wordpress_response)
 }
 
 /// returns status code of post request

@@ -39,7 +39,7 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     let openai_api_key = env::var("OPENAI_API_KEY").unwrap();
     let url = "https://api.openai.com/v1/chat/completions".to_string();
     let email_content: String = read_file("./email.txt".to_string()).map_err(|_| "Failed to get email content")?;
-    let gpt_prompt = read_file("./gpt_prompt.txt".to_string()).map_err(|_| "Failed to get gpt prompt content")?;
+    let gpt_prompt = read_file("./gpt_prompt.txt".to_string()).map_err(|_| "Failed to get gpt_prompt.txt content")?;
 
     if email_content.trim().is_empty() || gpt_prompt.trim().is_empty(){
         return Err("Email or gpt prompt content is empty!".into());

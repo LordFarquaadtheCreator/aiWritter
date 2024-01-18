@@ -19,7 +19,7 @@ headers = {
 
 let request = axios.post(
   "https://rightondigital.com/wp-json/wp/v2/media",
-  readFile(),
+  img_bytes,
   { headers: headers }
 ).then((response) => {
     console.log(response.data.id);
