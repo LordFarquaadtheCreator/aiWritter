@@ -141,7 +141,7 @@ js/output.png
 js/text.png
 js/title.txt
 src/email.txt
-src/gpt_prompt.txt
+# src/gpt_prompt.txt
 src/gpt_response_.json
 src/gpt_response_formatted.json
 
