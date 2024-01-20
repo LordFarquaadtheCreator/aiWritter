@@ -10,13 +10,12 @@ use wordpress::post;
 // use wordpress::post_image;
 use std::error::Error;
 
-mod post_to_insta;
+// mod post_to_insta;
 // use post_to_insta::post_to_insta;
 
-// will break if tags have break characters in them!!!
 
 /// reads file & returns contents as string
-async fn read_file(file_name: &str) -> Result<String, Box<dyn std::error::Error>> {
+async fn read_file_to_string(file_name: &str) -> Result<String, Box<dyn std::error::Error>> {
     let file_path = format!("./{}", file_name);
     let file_contents = tokio::fs::read_to_string(file_path).await?;
     Ok(file_contents)
@@ -36,7 +35,7 @@ async fn main (){
 
 
     // case: content body has invalid characters - i manually fixed it
-    // let content: String = read_file("gpt_response_formatted.json").await.unwrap();
+    // let content: String = read_file_to_string("gpt_response_formatted.json").await.unwrap();
     // let content: GPTPrompt = serde_json::from_str(&content).unwrap();
 
     // iteratively create & store tags to be used in post
