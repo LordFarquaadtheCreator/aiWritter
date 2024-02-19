@@ -15,7 +15,7 @@ function parseHTML(html){
 /**
  * 
  * @param {string} query 
- * @returns array of hashtags
+ * @returns array of hashtags, -1 if error
  */
 export async function getHash(query){
   const options = {
@@ -27,11 +27,12 @@ export async function getHash(query){
     const response = await axios.request(options);
     return(parseHTML(response.data));
   } catch (error) {
-    console.error(error);
+    // console.error(error);
+    return -1;
     process.exit();
   }
 }
 
-// use case
-const res = await getHash('rza');
-console.log(res);
+// // use case
+// const res = await getHash('ilikepoteatossaleidsansdasdasdasd');\
+// console.log(res);

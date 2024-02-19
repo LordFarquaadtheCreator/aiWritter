@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv/config';
 import fs from 'fs';
+import getHash from 'getHashTags.mjs';
 
 function readFile(fileName){
     const data = fs.readFileSync(`./${fileName}`, 'utf-8');
@@ -55,10 +56,23 @@ async function postToInstagram(photoUrl, hashtags){
 
     return success;
 }
+
+
 const args = process.argv.slice(2);
 const photoUrl = args[0];
+const topic = args[1];
 if(!photoUrl) {
     console.log("No photo url provided - first arg pls");
     process.exit();
 }
-await postToInstagram(photoUrl, readFile('hashtags.txt'))
+if(!topic) {
+    console.log("No topic provided - second arg pls");
+    process.exit();
+}
+const hashtags = await getHash(topic);
+if (hashtags == -1) {
+    console.log("Error getting hashtags");
+    process.exit();
+}
+
+await postToInstagram(photoUrl, hashtags)
