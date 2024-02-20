@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv/config';
 import fs from 'fs';
-import getHash from 'getHashTags.mjs';
+import {getHash} from './getHashTags.mjs';
 
 function readFile(fileName){
     const data = fs.readFileSync(`./${fileName}`, 'utf-8');
@@ -9,6 +9,8 @@ function readFile(fileName){
 };
 async function createContainer(photoUrl, hashtags){
     const caption = encodeURIComponent(`Yeah we did that! Check this out and more with the link in bio!\n.\n.\n.\n${hashtags}`);
+    // console.log(caption);
+    // process.exit()
     const userId = process.env.GRAPH_USER_ID;
     const accessToken = process.env.GRAPH_ACCESS_TOKEN;
     let postId = '';
@@ -20,7 +22,9 @@ async function createContainer(photoUrl, hashtags){
         postId = response.data.id;
         // console.log('Post ID:', postId);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        console.error('Error:', error.response);
+        process.exit();
     }
     return postId;
 };
