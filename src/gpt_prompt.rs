@@ -10,14 +10,8 @@ use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 
 use crate::BI;
 use BI::GPTPrompt;
-
-// save to txt
-fn save_to_txt (content: String, extra: String) -> Result<(), Box<dyn std::error::Error>> {
-    let mut file = File::create(format!("./gpt_response_{extra}.json"))?;
-    let _ = file.write_all(content.as_bytes())?;
-    println!("{}", "Saved response to JSON file".bold());
-    Ok(())
-}
+use BI::prune_characters;
+use BI::save;
 
 // reads & returns content of files
 fn read_file(file_path:String) -> io::Result<String> {
@@ -71,7 +65,7 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
 
     let jresponse: serde_json::Value = serde_json::from_str(&response)?;
     let completion = jresponse["choices"][0]["message"]["content"].as_str().unwrap_or("");
-    let _ = save_to_txt(completion.to_string(), "".to_string());
+    let _ = save(completion.to_string(), "gpt_response".to_string(), "json".to_string());
     println!("{}", "Prompting Done!".blue());
 
     // convert response to string & return
@@ -106,7 +100,7 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
         excerpt: gpt_body["excerpt"].as_str().unwrap().to_string(),
     };
     println!("Saved response to GPTPrompt body");
-    let _ = save_to_txt(serde_json::to_string(&response).unwrap(), "formatted".to_string());
+    let _ = save(serde_json::to_string(&response).unwrap(), "formatted_gpt_response".to_string(), "json".to_string());
 
     Ok(response)
 }
