@@ -29,9 +29,9 @@ pub fn save(content: String, file_name: String, obj_type: String) -> Result<Stri
     let _ = file.write_all(content.as_bytes())?;
     Ok(format!("./{file_name}.{obj_type}").to_string())
 }
-
-pub fn read_file(file_name: String) -> Result<String, Box<dyn std::error::Error>> {
-    let file_path = format!("./{}", file_name);
-    let file_contents = std::fs::read_to_string(file_path)?;
+/// reads file & returns contents as string
+pub fn read(file_name: String) -> Result<String, Box<dyn std::error::Error>> {
+    let file_path: String = format!("./{}", file_name);
+    let file_contents: String = std::fs::read_to_string(file_path)?;
     Ok(file_contents)
 }
