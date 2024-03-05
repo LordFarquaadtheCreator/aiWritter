@@ -1,7 +1,6 @@
 use serde::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::Write;
-use colored::Colorize;
 use serde_json::json;
 
 #[derive(Debug, Serialize, Deserialize)]
