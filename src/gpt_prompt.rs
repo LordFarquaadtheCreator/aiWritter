@@ -47,7 +47,6 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
 
     // send request to openai
     let client = reqwest::Client::new();
-
     let mut headers = HeaderMap::new();
     headers.insert(CONTENT_TYPE, "application/json".parse().unwrap());
     headers.insert(AUTHORIZATION, format!("Bearer {}", openai_api_key).parse().unwrap());
@@ -65,7 +64,7 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
             }
         ],
         "response_format": { "type": "json_object" },
-        "temperature": 0
+        "temperature": 1.1
     });
 
     println!("{}", "Prompting GPT...".green());
