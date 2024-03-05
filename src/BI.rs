@@ -12,7 +12,7 @@ pub struct GPTPrompt {
     pub categories: Vec<i64>,
     pub excerpt: String,
 }
-
+/// removes invalid characters from object subitems (String only)
 pub fn prune_characters(object:Vec<String>) -> Vec<String> {
     let mut new_object: Vec<String> = Vec::new();
 
@@ -24,8 +24,14 @@ pub fn prune_characters(object:Vec<String>) -> Vec<String> {
 }
 /// saves content to file
 /// obj_type MUST be valid type (no error checking)
-pub fn save(content: String, file_name: String, obj_type: String) -> Result<(), Box<dyn std::error::Error>> {
+pub fn save(content: String, file_name: String, obj_type: String) -> Result<String, Box<dyn std::error::Error>> {
     let mut file = File::create(format!("./{file_name}.{obj_type}"))?;
     let _ = file.write_all(content.as_bytes())?;
-    Ok(())
+    Ok(format!("./{file_name}.{obj_type}").to_string())
+}
+
+pub fn read_file(file_name: String) -> Result<String, Box<dyn std::error::Error>> {
+    let file_path = format!("./{}", file_name);
+    let file_contents = std::fs::read_to_string(file_path)?;
+    Ok(file_contents)
 }
