@@ -10,7 +10,7 @@ use BI::GPTPrompt;
 use BI::prune_characters;
 use BI::{save, read};
 
-// prompts gpt with email content
+/// prompts gpt with email content
 async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     // set up variables & client
     dotenv().ok();
@@ -63,12 +63,10 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     Ok(completion.to_string())
 }
 
-// convert ChatCompletionResponse into GPTPrompt struct
+/// convert ChatCompletionResponse into GPTPrompt struct
 fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::Error>> {
-    // convert to json
     println!("Converting to json");
     let gpt_body: serde_json::Value = serde_json::from_str(&gpt_reponse)?;
-    // println!("{:#?}", gpt_body);
     
     // ensuring that vectors are vectors of strings
     let tags: Result<Vec<String>, _> = gpt_body["tags"].as_array()
@@ -76,6 +74,7 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
         .iter()
         .map(|v| v.as_str().ok_or("Expected a string").map(|s| s.to_owned()))
         .collect();
+    let pruned_tags: Vec<String> = prune_characters(tags.unwrap());
 
     let categories: Result<Vec<i64>, _> = gpt_body["categories"].as_array()
         .ok_or("Expected an array")?
@@ -86,7 +85,7 @@ fn parse_reponse (gpt_reponse: String) -> Result<GPTPrompt, Box<dyn std::error::
     let response: GPTPrompt = GPTPrompt{
         title: gpt_body["title"].as_str().unwrap().to_string(),
         content: gpt_body["content"].as_str().unwrap().to_string(),
-        tags: tags.unwrap(),
+        tags: pruned_tags,
         categories: categories.unwrap(),
         excerpt: gpt_body["excerpt"].as_str().unwrap().to_string(),
     };
