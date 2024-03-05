@@ -29,7 +29,7 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     headers.insert(AUTHORIZATION, format!("Bearer {}", openai_api_key).parse().unwrap());
 
     let request_data = json!({
-        "model": "gpt-4-1106-preview",
+        "model": "gpt-4-0125-preview",
         "messages": [
             {
                 "role": "system",
