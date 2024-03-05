@@ -1,23 +1,14 @@
 use serde_json::json;
 use std::env;
-use std::fs;
 use std::io::{self};
 use dotenv::dotenv;
 use colored::*;
-use std::fs::File;
-use std::io::prelude::*;
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 
 use crate::BI;
 use BI::GPTPrompt;
 use BI::prune_characters;
-use BI::save;
-
-// reads & returns content of files
-fn read_file(file_path:String) -> io::Result<String> {
-    let content: String = fs::read_to_string(file_path)?;
-    Ok(content)
-}
+use BI::{save, read};
 
 // prompts gpt with email content
 async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
@@ -25,8 +16,8 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     dotenv().ok();
     let openai_api_key = env::var("OPENAI_API_KEY").unwrap();
     let url = "https://api.openai.com/v1/chat/completions".to_string();
-    let email_content: String = read_file("./email.txt".to_string()).map_err(|_| "Failed to get email content")?;
-    let gpt_prompt = read_file("./gpt_prompt.txt".to_string()).map_err(|_| "Failed to get gpt_prompt.txt content")?;
+    let email_content: String = read("email.txt".to_string()).map_err(|_| "Failed to get email content")?;
+    let gpt_prompt = read("gpt_prompt.txt".to_string()).map_err(|_| "Failed to get gpt_prompt.txt content")?;
 
     if email_content.trim().is_empty() || gpt_prompt.trim().is_empty(){
         return Err("Email or gpt prompt content is empty!".into());
@@ -113,7 +104,7 @@ pub async fn gpt_prompt() -> Result<GPTPrompt, Box<dyn std::error::Error>> {
         Ok(body) => body,
         Err(err) => return Err(format!("Error prompting GPT: {}", err).into()),    
     };    
-    // let gpt_body: String = read_file("./gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
+    // let gpt_body: String = read("gpt_response_.json".to_string()).map_err(|_| "Failed to get gpt response content")?;
 
     // parse response into GPTPrompt struct
     let gpt_reponse: Result<GPTPrompt, Box<dyn std::error::Error>> = parse_reponse(gpt_body);    
