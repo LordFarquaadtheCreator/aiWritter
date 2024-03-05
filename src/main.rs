@@ -19,13 +19,6 @@ use std::error::Error;
 // mod get_hashtags;
 // use get_hashtags::ask_website;
 
-/// reads file & returns contents as string
-async fn read_file_to_string(file_name: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let file_path = format!("./{}", file_name);
-    let file_contents = tokio::fs::read_to_string(file_path).await?;
-    Ok(file_contents)
-}
-
 #[tokio::main]
 async fn main (){
     let debug: bool = false;
