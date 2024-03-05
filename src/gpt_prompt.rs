@@ -6,17 +6,10 @@ use dotenv::dotenv;
 use colored::*;
 use std::fs::File;
 use std::io::prelude::*;
-use serde::{Serialize, Deserialize};
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GPTPrompt {
-    pub title: String,
-    pub content: String,
-    pub tags: Vec<String>,
-    pub categories: Vec<i64>,
-    pub excerpt: String,
-}
+use crate::BI;
+use BI::GPTPrompt;
 
 // save to txt
 fn save_to_txt (content: String, extra: String) -> Result<(), Box<dyn std::error::Error>> {
