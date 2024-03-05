@@ -1,8 +1,8 @@
 use futures::future::try_join_all;
 
-mod BI;
-use BI::prune_characters;
-use BI::GPTPrompt;
+mod bi;
+use bi::prune_characters;
+use bi::GPTPrompt;
 
 mod gpt_prompt;
 use gpt_prompt::gpt_prompt;

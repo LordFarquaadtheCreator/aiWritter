@@ -19,7 +19,7 @@ fn parse_html(html: &str) -> Vec<String> {
     matches
 }
 
-pub fn ask_website (topic: String){
+pub async fn ask_website (topic: String) -> Result<>{
     let client = reqwest::Client::new();
     let url = "https://best-hashtags.com/hashtags/".to_string() + &topic;
 

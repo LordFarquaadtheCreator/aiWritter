@@ -1,14 +1,13 @@
 use serde_json::json;
 use std::env;
-use std::io::{self};
 use dotenv::dotenv;
 use colored::*;
 use reqwest::header::{HeaderMap, CONTENT_TYPE, AUTHORIZATION};
 
-use crate::BI;
-use BI::GPTPrompt;
-use BI::prune_characters;
-use BI::{save, read};
+use crate::bi;
+use bi::GPTPrompt;
+use bi::prune_characters;
+use bi::{save, read};
 
 /// prompts gpt with email content
 async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
