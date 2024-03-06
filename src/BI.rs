@@ -1,6 +1,7 @@
 use serde::{Serialize, Deserialize};
 use std::fs::File;
 use std::io::Write;
+use std::fs;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GPTPrompt {
@@ -32,4 +33,13 @@ pub fn read(file_name: String) -> Result<String, Box<dyn std::error::Error>> {
     let file_path: String = format!("./{}", file_name);
     let file_contents: String = std::fs::read_to_string(file_path)?;
     Ok(file_contents)
+}
+pub fn read_raw(file_path: &str) -> std::io::Result<Vec<u8>> {
+    let bytes = fs::read(file_path)?;
+    Ok(bytes)
+}
+
+/// terminates fn
+pub fn stop() -> () {
+    std::process::exit(0);
 }
