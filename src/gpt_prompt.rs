@@ -29,7 +29,8 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
     headers.insert(AUTHORIZATION, format!("Bearer {}", openai_api_key).parse().unwrap());
 
     let request_data = json!({
-        "model": "gpt-4-0125-preview",
+        "model": "gpt-4-turbo",
+        "response_format": { "type": "json_object" },
         "messages": [
             {
                 "role": "system",
@@ -40,8 +41,7 @@ async fn generate_response() -> Result<String, Box<dyn std::error::Error>> {
                 "content": email_content
             }
         ],
-        "response_format": { "type": "json_object" },
-        "temperature": 1.1
+        "temperature": 1.2
     });
 
     println!("{}", "Prompting GPT...".green());
