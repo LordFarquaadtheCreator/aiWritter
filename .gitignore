@@ -144,5 +144,6 @@ src/email.txt
 # src/gpt_prompt.txt
 src/gpt_response_.json
 src/gpt_response_formatted.json
-
+src/gpt_response.json
+src/formatted_gpt_response.json
 righton-images
