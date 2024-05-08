@@ -8,5 +8,6 @@
     "fs": "^0.0.1-security",
     "node-fetch": "^3.3.2",
     "openai": "^4.19.1"
-  }
+  },
+  "type": "module"
 }

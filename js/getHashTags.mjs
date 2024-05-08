@@ -27,12 +27,21 @@ export async function getHash(query){
     const response = await axios.request(options);
     return(parseHTML(response.data));
   } catch (error) {
-    // console.error(error);
+    console.error(error.stack);
     return -1;
     process.exit();
   }
 }
 
-// // use case
-// const res = await getHash('ilikepoteatossaleidsansdasdasdasd');\
-// console.log(res);
+let query;
+process.argv[2] !== undefined ? query = process.argv[2] : process.exit(1);
+
+let res;
+try{
+  res = await getHash(query);
+} catch (error) {
+  console.error(error.stack);
+  process.exit();
+}
+
+console.log(res.join(" "))
