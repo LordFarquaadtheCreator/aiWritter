@@ -1,6 +1,8 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
+
+
 /**
  * parses HTML to return hashtags, if any
  * @param html string
@@ -47,14 +49,17 @@ function pbcopy(data: string) {
 }
 
 async function main(){
-  let query: string = process.argv[2] !== undefined ? process.argv[2] : process.exit(1);
-
+  let query: string = process.argv[2] !== undefined ? process.argv[2] : '';
   let res: Array<string>;
+
+  if(process.argv[2] === undefined){
+    throw ReferenceError("missing hashtag topic in argument")
+  }
+
   try{
     res = await getHash(query);
   } catch (error: any) {
-    console.error(error.stack);
-    process.exit(1);
+    throw Error(error)
   }
 
   pbcopy(res.join(" "));
