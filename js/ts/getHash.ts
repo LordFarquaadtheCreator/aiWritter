@@ -1,8 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 
-
-
 /**
  * parses HTML to return hashtags, if any
  * @param html string
