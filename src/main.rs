@@ -1,6 +1,7 @@
 use futures::future::try_join_all;
 
 mod bi;
+mod get_has;
 use bi::prune_characters;
 use bi::GPTPrompt;
 

@@ -34,6 +34,7 @@ pub fn read(file_name: String) -> Result<String, Box<dyn std::error::Error>> {
     let file_contents: String = std::fs::read_to_string(file_path)?;
     Ok(file_contents)
 }
+
 pub fn read_raw(file_path: &str) -> std::io::Result<Vec<u8>> {
     let bytes = fs::read(file_path)?;
     Ok(bytes)
