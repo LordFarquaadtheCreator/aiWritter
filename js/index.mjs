@@ -1,27 +1,75 @@
-import express from 'express';
-import { handler } from './createPost.mjs';
-import multer from 'multer';
-const upload = multer();
-const app = express();
+import fetch from 'node-fetch';
+import { promises as fs } from 'fs';
+import { createPost } from './gptPrompt.mjs';
+import { createTag } from './wordpress.mjs';
+import chalk from 'chalk';
 
-app.get("/", (req, res) => {
-    return res.send("whats up rocky").status(200)
-})
+const wordPressPost = async () => {
+    const url = 'https://rightondigital.com/wp-json/wp/v2/posts';
+    const credentials = Buffer.from('fahadfaruqi1@gmail.com:' + process.env.PASSWORD).toString('base64');
 
-app.post("/lambda", upload.none(), (req, res) => {
-    const body = req.body;
+    const postData = {
+        title: post.title,
+        excerpt: post.excerpt,
+        content: post.content,
+        status: 'draft',
+        categories: post.categories, // This should be an array of category IDs
+        tags: post.tags
+    };
 
-    if (!body || !body.email) return res.send(`missing body or email, got ${body}`)
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Basic ${credentials}`
+        },
+        body: JSON.stringify(postData)
+    });
+
+    if (!response.ok) {
+        const message = `An error has occurred: ${response.status}`;
+        throw new Error(message);
+    }
+
+    const postResponse = await response.json();
+    return postResponse;
+};
+
+// convert unique and duplicate tags to ids
+async function convertTagsToIDs(post) {
+    if (!post.tags || !Array.isArray(post.tags)) {
+        throw new Error('No tags array found or the tags property is not an array.');
+    }
+
+    const tagPromises = post.tags.map(tagName => createTag(tagName));
+    const tagIDs = await Promise.all(tagPromises);
+
+    return tagIDs;
+}
+
+
+export const handler = async (event, context, callback) => {
+    let email = '';
 
     try{
-        const response = handler(body);
-// 
-        return response.send(response).status(200);
-    } catch (error) {
-        return response.send(Error(error.toString()));
-    }
-})
+        const params = event.body;
+        email = params.email;
 
-app.listen(2222, () => {
-    console.log("Server listening on ", 2222)
-});
+        // process article
+        console.log("Creating Post!");
+        const post = JSON.parse(await createPost(email));
+
+        post.tags = await convertTagsToIDs(post);
+
+        wordPressPost().then(post => {
+            console.log(chalk.black.bgGreen("Success!"));
+        }).catch(error => {
+            callback(error, 500);
+        });
+
+        return callback(null, 200)
+    } catch(e) {
+        callback(e, 400)
+    }
+
+};
