@@ -10,6 +10,7 @@ export const handler = async (event, context) => {
         console.log('Creating post...');
         let post = await createPost(email);
         console.log('Post created:', post);
+        
         post = JSON.parse(post);
         post.tags = await convertTagsToIDs(post);
 

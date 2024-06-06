@@ -52,7 +52,7 @@ export async function convertTagsToIDs(post) {
   return tagIDs;
 }
 
-export const wordPressPost = async () => {
+export const wordPressPost = async (post) => {
   const url = 'https://rightondigital.com/wp-json/wp/v2/posts';
   const credentials = Buffer.from('fahadfaruqi1@gmail.com:' + process.env.PASSWORD).toString('base64');
 
