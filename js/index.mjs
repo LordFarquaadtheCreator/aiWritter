@@ -1,8 +1,5 @@
-import fetch from 'node-fetch';
-import { promises as fs } from 'fs';
 import { createPost } from './gptPrompt.mjs';
 import { convertTagsToIDs, wordPressPost } from './wordpress.mjs';
-import chalk from 'chalk';
 
 export const handler = async (event, context) => {
     // todo: rewrite in typescript
@@ -26,6 +23,6 @@ export const handler = async (event, context) => {
     } catch(e) {
         return (e, 400)
     }
-    
+
     return 201;
 };
