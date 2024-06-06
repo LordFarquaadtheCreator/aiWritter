@@ -1,6 +1,4 @@
 import fetch from 'node-fetch';
-import dotenv from 'dotenv/config';
-import { promises as fs } from 'fs';
 import axios from 'axios';
 
 async function createTag(name) {
