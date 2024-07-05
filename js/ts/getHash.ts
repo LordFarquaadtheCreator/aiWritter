@@ -8,7 +8,7 @@ import { spawn } from "child_process";
  * @returns array of hashtags, -1 if error
  */
 export async function getHash(query: string): Promise<String> {
-  query = query.replace(/\s/g, " ");
+  query = query.replace(/\s/g, "");
   const options = {
     method: 'GET',
     url: `https://best-hashtags.com/hashtag/${query}/`,
