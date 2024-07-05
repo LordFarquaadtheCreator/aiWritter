@@ -3,28 +3,12 @@ import cheerio from 'cheerio';
 import { spawn } from "child_process";
 
 /**
- * parses HTML to return hashtags, if any
- * @param html string
- * @returns Array<string> | null
- */
-function parseHTML(html: string): Array<any> {
-  const $ = cheerio.load(html);  
-  const hashtags = $('div.tag-box').text();
-
-  let matches: RegExpMatchArray | null = hashtags.match(/#\w+/g);
-  
-  if (matches) {
-    matches = matches.slice(0, 30) as RegExpMatchArray | null;
-  }
-  return Array(matches);
-}
-
-/**
+ * gets hashtags from best-hashtags.com
  * @param {string} query 
  * @returns array of hashtags, -1 if error
  */
-export async function getHash(query: string): Promise<Array<string>> {
-  query = query.replace(/\s/g, '');
+export async function getHash(query: string): Promise<String> {
+  query = query.replace(/\s/g, " ");
   const options = {
     method: 'GET',
     url: `https://best-hashtags.com/hashtag/${query}/`,
@@ -32,17 +16,35 @@ export async function getHash(query: string): Promise<Array<string>> {
 
   try {
     const response = await axios.request(options);
-    return(parseHTML(response.data));
+    return parseHTML(response.data);
   } catch (error: any) {
     throw new Error(`No response ${error.stack}`)
   }
 }
 
 /**
- * copies to clipboard
+ * parses HTML to return hashtags, if any
+ * @param html string
+ * @returns Array<string> | null
+ */
+function parseHTML(html: string): string {
+  const $ = cheerio.load(html);  
+  const hashtags = $('div.tag-box').text();
+
+  let matches: RegExpMatchArray | null = hashtags.match(/#\w+/g);
+  
+  if (matches) {
+    matches = matches.slice(0, 30) as RegExpMatchArray;
+    return matches?.toString().replace(/,/g, " ");;
+  }
+  throw new Error("No hashtags found");
+}
+
+/**
+ * copies data to clipboard
  * @param data string
  */
-function pbcopy(data: string) {
+function pbcopy(data: String) {
   const proc = spawn("pbcopy");
   proc.stdin.write(data); 
   proc.stdin.end();
@@ -50,19 +52,19 @@ function pbcopy(data: string) {
 
 async function main(){
   let query: string = process.argv[2] !== undefined ? process.argv[2] : '';
-  let res: Array<string>;
 
   if(process.argv[2] === undefined){
     throw ReferenceError("missing hashtag topic in argument")
   }
 
   try{
-    res = await getHash(query);
+    const res: String = await getHash(query);
+    pbcopy(res);
   } catch (error: any) {
-    throw Error(error)
+    console.error(error)
+    process.exit(1);
   }
 
-  pbcopy(res.join(" "));
 }
 
 main()
