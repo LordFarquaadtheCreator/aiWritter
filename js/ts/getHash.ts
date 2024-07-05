@@ -1,5 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
+import { spawn } from "child_process";
 
 /**
  * parses HTML to return hashtags, if any
@@ -42,8 +43,9 @@ export async function getHash(query: string): Promise<Array<string>> {
  * @param data string
  */
 function pbcopy(data: string) {
-  var proc = require('child_process').spawn('pbcopy'); 
-  proc.stdin.write(data); proc.stdin.end();
+  const proc = spawn("pbcopy");
+  proc.stdin.write(data); 
+  proc.stdin.end();
 }
 
 async function main(){
