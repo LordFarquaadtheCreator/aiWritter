@@ -18,7 +18,7 @@ export async function getHash(query: string): Promise<String> {
     const response = await axios.request(options);
     return parseHTML(response.data);
   } catch (error: any) {
-    throw new Error(`No response ${error.stack}`)
+    throw new Error(`No response ${error.message}`)
   }
 }
 
@@ -61,7 +61,7 @@ async function main(){
     const res: String = await getHash(query);
     pbcopy(res);
   } catch (error: any) {
-    console.error(error)
+    console.error(error.toString())
     process.exit(1);
   }
 
