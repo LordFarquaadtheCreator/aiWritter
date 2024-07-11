@@ -63,6 +63,8 @@ async function main(){
   } catch (error: any) {
     console.error(error.toString())
     process.exit(1);
+  } finally {
+    console.log("Hashtags copied to clipboard")
   }
 
 }
