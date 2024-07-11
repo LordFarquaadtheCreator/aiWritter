@@ -8,7 +8,6 @@ import { spawn } from "child_process";
  * @returns array of hashtags, -1 if error
  */
 export async function getHash(query: string): Promise<String> {
-  query = query.replace(/\s/g, "");
   const options = {
     method: 'GET',
     url: `https://best-hashtags.com/hashtag/${query}/`,
@@ -52,6 +51,7 @@ function pbcopy(data: String) {
 
 async function main(){
   let query: string = process.argv[2] !== undefined ? process.argv[2] : '';
+  query = query.replace(/\s/g, "").toLowerCase();
 
   if(process.argv[2] === undefined){
     throw ReferenceError("missing hashtag topic in argument")
