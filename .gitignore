@@ -4,6 +4,7 @@ env/
 *.mp4
 *.mov
 *.mp3
+__pycache__/
 
 # Logs
 logs
