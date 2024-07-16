@@ -26,6 +26,7 @@ def get_frame_from_video(VIDEO_PATH: str, TIME: int):
         frame_PIL = Image.fromarray(frame)
         frame_hash = imagehash.phash(frame_PIL)
         cap.release()
+        print(f"Got The Frame at {TIME}s!")
 
         return frame_hash
     else:
