@@ -2,28 +2,35 @@ import cv2
 import numpy as np
 from PIL import Image
 import imagehash
+from moviepy.editor import VideoFileClip, AudioFileClip
 
-# Load the specific image you want to detect and replace
-target_image_path = "path_to_target_image.jpg"
-replacement_image_path = "path_to_replacement_image.jpg"
-target_image = cv2.imread(target_image_path)
-replacement_image = cv2.imread(replacement_image_path)
+# TODO: turn this into a CLI and combine with frame grabber, pushing all generated files to an untracked folder
+# the replaced frame also needs to be fitted onto the canvas just a little bit better
+
+IMAGE_TO_DELETE = "frame_to_delete.png"
+REPLACEMENT_IMAGE = "../Downloads/IMG_1207.jpeg"
+INPUT_VIDEO_PATH = "../Downloads/GMT20240614-215723_Recording_640x360.mp4"
+OUTPUT_VIDEO_PATH_VIDEO = "processed_video.mp4"
+OUTPUT_VIDEO_PATH_FINAL = "processed_final.mp4"
+
+# Load the target and replacement images
+target_image = cv2.imread(IMAGE_TO_DELETE)
+replacement_image = cv2.imread(REPLACEMENT_IMAGE)
 
 # Generate the hash for the target image
-target_image_pil = Image.open(target_image_path)
+target_image_pil = Image.open(IMAGE_TO_DELETE)
 target_hash = imagehash.phash(target_image_pil)
 
 # Open the video file
-input_video_path = "path_to_input_video.mp4"
-output_video_path = "path_to_output_video.mp4"
-cap = cv2.VideoCapture(input_video_path)
+cap = cv2.VideoCapture(INPUT_VIDEO_PATH)
 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
 fps = cap.get(cv2.CAP_PROP_FPS)
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-out = cv2.VideoWriter(output_video_path, fourcc, fps, (width, height))
+out = cv2.VideoWriter(OUTPUT_VIDEO_PATH_VIDEO, fourcc, fps, (width, height))
 
+print("Starting To Replace!")
 while cap.isOpened():
     ret, frame = cap.read()
     if not ret:
@@ -44,3 +51,15 @@ while cap.isOpened():
 cap.release()
 out.release()
 cv2.destroyAllWindows()
+
+# Extract the audio from the original video
+original_video = VideoFileClip(INPUT_VIDEO_PATH)
+audio = original_video.audio
+audio.write_audiofile("temp_audio.mp3")
+
+# Combine the processed video with the extracted audio
+processed_video = VideoFileClip(OUTPUT_VIDEO_PATH_VIDEO)
+processed_video = processed_video.set_audio(AudioFileClip("temp_audio.mp3"))
+processed_video.write_videofile(OUTPUT_VIDEO_PATH_FINAL, codec="libx264")
+
+print("Processing complete! Final video saved as", OUTPUT_VIDEO_PATH_FINAL)
