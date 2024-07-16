@@ -43,12 +43,11 @@ def process_video(
 
 def main(
     target_image_hashed,
+    replacement_image,
     INPUT_VIDEO_PATH,
     OUTPUT_VIDEO_PATH_VIDEO,
     OUTPUT_VIDEO_PATH_FINAL,
 ):
-    replacement_image = cv2.imread(REPLACEMENT_IMAGE)
-
     process_video(
         target_image_hashed,
         replacement_image,
