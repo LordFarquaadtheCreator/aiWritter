@@ -15,7 +15,7 @@ def main_process():
 
     USE_CYNTHIA = True
     if USE_CYNTHIA:
-        REPLACEMENT_IMAGE = "target.png"  # hardcode if USE_CYNTHIA, future use only
+        REPLACEMENT_IMAGE = "assets/cynthia.jpeg"  # hardcode if USE_CYNTHIA, future use only
         print("The Default Photo of Cynthia will be used - target.png")
 
     print("Please Wait as We Process the Video")
