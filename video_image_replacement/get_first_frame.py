@@ -1,6 +1,8 @@
-def get_frame_from_video(VIDEO_PATH: str, TIME: int) -> cv2:
+def get_frame_from_video(VIDEO_PATH: str, TIME: int):
     import cv2
-
+    from PIL import Image
+    import imagehash
+    
     cap = cv2.VideoCapture(VIDEO_PATH)
 
     if not cap.isOpened():
@@ -20,8 +22,12 @@ def get_frame_from_video(VIDEO_PATH: str, TIME: int) -> cv2:
 
     if ret:
         # Save the frame as an image file
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        frame_PIL = Image.fromarray(frame)
+        frame_hash = imagehash.phash(frame_PIL)
         cap.release()
-        return frame
+
+        return frame_hash
     else:
         print("Error: Could not read frame")
         cap.release()
