@@ -9,7 +9,7 @@ def save_video(old_video_path: str, new_video_path: str, output_file_name: str) 
         new_video.set_audio(audio)
         # write new video to disk
         new_video.write_videofile(output_file_name)
-        # return path
+
         return output_file_name
     except exception:
         print("Error occured saving video and audio")
