@@ -1,6 +1,8 @@
-from moviepy.editor import VideoFileClip, AudioFileClip
-def save_video(new_video: VideoFileClip, old_video: VideoFileClip, output_file_name: str) -> str:
+def save_video(old_video_path: str, new_video_path: str, output_file_name: str) -> str:
+    from moviepy.editor import VideoFileClip, AudioFileClip
     try :
+        old_video_path = VideoFileClip(old_video_path)
+        new_video_path = VideoFileClip(new_video_path)
         # extract audio from old video
         audio: AudioFileClip = old_video.audio
         # save audio from old video to new video
