@@ -2,7 +2,7 @@ def get_frame_from_video(VIDEO_PATH: str, TIME: int):
     import cv2
     from PIL import Image
     import imagehash
-    
+
     cap = cv2.VideoCapture(VIDEO_PATH)
 
     if not cap.isOpened():

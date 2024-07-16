@@ -1,13 +1,14 @@
 import cv2
-import numpy as np
 from PIL import Image
 import imagehash
-from moviepy.editor import VideoFileClip, AudioFileClip
 from save_video import save_video
 
 REPLACEMENT_IMAGE = "target.png"
 
-def process_video(target_hash, replacement_image, input_video_path):
+
+def process_video(
+    target_hash, replacement_image, OUTPUT_VIDEO_PATH_VIDEO, input_video_path
+):
     # Open the video file
     cap = cv2.VideoCapture(input_video_path)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -40,9 +41,21 @@ def process_video(target_hash, replacement_image, input_video_path):
     cv2.destroyAllWindows()
 
 
-def main(target_image_hashed, INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL):
+def main(
+    target_image_hashed,
+    INPUT_VIDEO_PATH,
+    OUTPUT_VIDEO_PATH_VIDEO,
+    OUTPUT_VIDEO_PATH_FINAL,
+):
     replacement_image = cv2.imread(REPLACEMENT_IMAGE)
 
-    process_video(target_image_hashed, replacement_image, INPUT_VIDEO_PATH)
-    out_path = save_video(INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL)
+    process_video(
+        target_image_hashed,
+        replacement_image,
+        OUTPUT_VIDEO_PATH_VIDEO,
+        INPUT_VIDEO_PATH,
+    )
+    out_path = save_video(
+        INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL
+    )
     print("Processing complete! Final video saved as", out_path)
