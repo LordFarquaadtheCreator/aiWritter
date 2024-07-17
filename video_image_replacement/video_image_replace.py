@@ -3,9 +3,6 @@ from PIL import Image
 import imagehash
 from save_video import save_video
 
-REPLACEMENT_IMAGE = "target.png"
-
-
 def process_video(
     target_hash, replacement_image, OUTPUT_VIDEO_PATH_VIDEO, input_video_path
 ):
