@@ -26,7 +26,7 @@ def main_process():
     REPLACEMENT_FRAME = replacement_frame(SHAPE)
 
     print("Please Wait as We Process the Video")
-    main(
+    video_image_replace(
         IMAGE_TO_DELETE,
         REPLACEMENT_FRAME,
         INPUT_VIDEO_PATH,
@@ -36,7 +36,7 @@ def main_process():
 
 
 if __name__ == "__main__":
-    from video_image_replace import main
+    from video_image_replace import video_image_replace
     from get_first_frame import get_frame_from_video
     import os
     from generate_replacement_frame import replacement_frame

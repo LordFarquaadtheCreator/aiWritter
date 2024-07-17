@@ -3,6 +3,7 @@ from PIL import Image
 import imagehash
 from save_video import save_video
 
+
 def process_video(
     target_hash, replacement_image, OUTPUT_VIDEO_PATH_VIDEO, input_video_path
 ):
@@ -38,7 +39,7 @@ def process_video(
     cv2.destroyAllWindows()
 
 
-def main(
+def video_image_replace(
     target_image_hashed,
     replacement_image,
     INPUT_VIDEO_PATH,
