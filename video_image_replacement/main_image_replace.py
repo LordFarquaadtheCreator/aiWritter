@@ -20,6 +20,7 @@ def main_process():
         REPLACEMENT_IMAGE = (
             "assets/cynthia.jpeg"  # hardcode if USE_CYNTHIA, future use only
         )
+
         print("The Default Photo of Cynthia will be used - target.png")
 
     print("Generating Target Frame")
