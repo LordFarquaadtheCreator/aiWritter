@@ -12,7 +12,7 @@ def main_process():
         return main_process()
 
     OUTPUT_VIDEO_PATH_VIDEO = "assets/edited_video.mp4"  # hardcoded
-    OUTPUT_VIDEO_PATH_FINAL = "assets/processed_final.mp4"  # hardcoded
+    OUTPUT_VIDEO_PATH_FINAL = "../../Downloads/processed_final.mp4"  # hardcoded
     SHAPE, IMAGE_TO_DELETE = get_frame_from_video(INPUT_VIDEO_PATH, int(FRAME_TO_GRAB))
 
     USE_CYNTHIA = True
