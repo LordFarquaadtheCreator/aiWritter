@@ -6,8 +6,7 @@ def get_frame_from_video(VIDEO_PATH: str, TIME: int):
     cap = cv2.VideoCapture(VIDEO_PATH)
 
     if not cap.isOpened():
-        print("Error: Could not open video.")
-        exit()
+        raise OSError("Could not open video")
 
     FPS = cap.get(cv2.CAP_PROP_FPS)
 
@@ -31,6 +30,5 @@ def get_frame_from_video(VIDEO_PATH: str, TIME: int):
 
         return shape, frame_hash
     else:
-        print("Error: Could not read frame")
         cap.release()
-        exit()
+        OSError("Could not read frame")
