@@ -1,4 +1,4 @@
-def replacement_frame(dim: (int, int)):
+def replacement_frame(working_dir: str, dim: (int, int)):
     """
     Generates replacement frame given nxm dimensions of frame to generate
     Defaults to use Cythnia Horner journalism photo
@@ -7,10 +7,11 @@ def replacement_frame(dim: (int, int)):
     """
     import cv2
     from PIL import Image
+    import os
 
     CYNTHIA_SCALE = 75
     # get cynthia's image
-    cynthia = Image.open("assets/cynthia.jpeg")
+    cynthia = Image.open(os.path.join(working_dir, "assets/cynthia.jpeg"))
 
     # resize her photo
     percentage_to_fill = (dim[1] / cynthia.size[1]) * (CYNTHIA_SCALE / 100)
@@ -32,5 +33,5 @@ def replacement_frame(dim: (int, int)):
     # add cynthia's photo to middle
     canvas.paste(cynthia, adjusted_center)
     # return encoded image
-    canvas.save("assets/target.png")
-    return cv2.imread("assets/target.png")
+    canvas.save(os.path.join(working_dir, "assets/target.png"))
+    return cv2.imread(os.path.join(working_dir, "assets/target.png"))
