@@ -1,45 +1,19 @@
-def main_process():
-    INPUT_VIDEO_PATH = "/Users/fahadfaruqi/Downloads/" + input(
-        "Enter file name of video in Downloads folder:\n"
-    )
-    if not os.path.exists(INPUT_VIDEO_PATH):
-        print("Error: File not found")
-        return main_process()
+def main():
+    import subprocess
+    import os
 
-    FRAME_TO_GRAB = input("Enter time of frame to replace from video (in seconds):\n")
-    if not FRAME_TO_GRAB.isdigit():
-        print("Error: Invalid time")
-        return main_process()
+    venv_path = os.path.join(os.getcwd(), "env")
+    if not os.path.exists(venv_path):
+        raise FileNotFoundError("Virtual environment not found at {}".format(venv_path))
 
-    OUTPUT_VIDEO_PATH_VIDEO = "assets/edited_video.mp4"  # hardcoded
-    OUTPUT_VIDEO_PATH_FINAL = "../../Downloads/processed_final.mp4"  # hardcoded
-    SHAPE, IMAGE_TO_DELETE = get_frame_from_video(INPUT_VIDEO_PATH, int(FRAME_TO_GRAB))
+    venv_python = os.path.join(venv_path, "bin", "python3")
+    if not os.path.exists(venv_python):
+        raise FileNotFoundError("Python executable not found at {}".format(venv_python))
 
-    USE_CYNTHIA = True
-    if USE_CYNTHIA:
-        REPLACEMENT_IMAGE = (
-            "assets/cynthia.jpeg"  # hardcode if USE_CYNTHIA, future use only
-        )
+    print("Using Python executable at:", venv_python)
 
-        print("The Default Photo of Cynthia will be used - target.png")
-
-    print("Generating Target Frame")
-    REPLACEMENT_FRAME = replacement_frame(SHAPE)
-
-    print("Please Wait as We Process the Video")
-    video_image_replace(
-        IMAGE_TO_DELETE,
-        REPLACEMENT_FRAME,
-        INPUT_VIDEO_PATH,
-        OUTPUT_VIDEO_PATH_VIDEO,
-        OUTPUT_VIDEO_PATH_FINAL,
-    )
+    subprocess.check_call([venv_python, "aux_main.py"])
 
 
 if __name__ == "__main__":
-    from video_image_replace import video_image_replace
-    from get_first_frame import get_frame_from_video
-    import os
-    from generate_replacement_frame import replacement_frame
-
-    main_process()
+    main()
