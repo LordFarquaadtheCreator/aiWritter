@@ -1,0 +1,2 @@
+class ExitQuery(Exception):
+    pass
