@@ -23,6 +23,8 @@ def get_time_stamp(EXIT_KEY) -> int:
         print("Error: input must be an integer")
         return get_time_stamp(EXIT_KEY)
 
+    return FRAME_TO_GRAB
+
 
 def main_process():
     from video_image_replace import video_image_replace
