@@ -1,0 +1,23 @@
+# 
+name : tests
+run-name :  i'm over here running tests i got tests on my dick fr im a freak fr man
+on : [push]
+
+jobs:
+  run-tests-file:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@5
+        with:
+          python-version: '3.10'
+      - name: Create virtual environment
+        run: python -m venv env
+        working-directory: ./video_image_replacement
+      - name: Install dependencies
+        run: pip install -r req.txt
+        working-directory: ./video_image_replacement
+      - name: Run tests
+        run: python tests.py
+        working-directory: ./video_image_replacement
