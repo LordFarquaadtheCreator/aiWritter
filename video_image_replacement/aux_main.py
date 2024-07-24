@@ -4,9 +4,9 @@ def main_process():
     from utils.get_first_frame import get_frame_from_video
     from utils.generate_replacement_frame import replacement_frame
     from utils.exception import ExitQuery
-    from pathlib import Path
     from inputs.get_path import get_video_path
     from inputs.get_time import get_time_stamp
+    from pathlib import Path
 
     EXIT_KEY = "q"
     ROOT = Path.home()
