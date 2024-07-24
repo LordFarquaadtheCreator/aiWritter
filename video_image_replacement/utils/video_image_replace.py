@@ -1,7 +1,7 @@
 import cv2
 from PIL import Image
 import imagehash
-from save_video import save_video
+from utils.save_video import save_video
 
 
 def process_video(
@@ -52,5 +52,7 @@ def video_image_replace(
         OUTPUT_VIDEO_PATH_VIDEO,
         INPUT_VIDEO_PATH,
     )
-    out_path = save_video(INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL)
+    out_path = save_video(
+        INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL
+    )
     print("Processing complete! Final video saved as", out_path)
