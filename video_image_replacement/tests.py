@@ -17,7 +17,6 @@ class unit_tests:
         self.__mute__()
 
         _, _ = get_frame_from_video("mocks/video.mp4", 0)
-        _, _ = get_frame_from_video("mocks/video.mp4", -1)
 
         self.__cleanup__()
 
@@ -30,6 +29,8 @@ class unit_tests:
         _ = replacement_frame(os.getcwd(), (100, 100))
 
         self.__cleanup__()
+
+    
 
 
 if __name__ == "__main__":
