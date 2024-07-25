@@ -1,11 +1,12 @@
 def main_process():
     import os
-    from utils.video_image_replace import video_image_replace
+    from utils.video_image_replace import process_video
     from utils.get_first_frame import get_frame_from_video
     from utils.generate_replacement_frame import replacement_frame
     from utils.exception import ExitQuery
     from inputs.get_path import get_video_path
     from inputs.get_time import get_time_stamp
+    from utils.save_video import save_video
     from pathlib import Path
 
     EXIT_KEY = "q"
@@ -36,13 +37,15 @@ def main_process():
     REPLACEMENT_FRAME = replacement_frame(CURR_DIRR, SHAPE)
 
     print("Please Wait as We Process the Video")
-    video_image_replace(
+    process_video(
         IMAGE_TO_DELETE,
         REPLACEMENT_FRAME,
         INPUT_VIDEO_PATH,
         OUTPUT_VIDEO_PATH_VIDEO,
-        OUTPUT_VIDEO_PATH_FINAL,
     )
+
+    print("Processing complete! Saving Final Video as:", OUTPUT_VIDEO_PATH_FINAL)
+    save_video(INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,10 @@
-import cv2
-from PIL import Image
-import imagehash
-from utils.save_video import save_video
-
-
 def process_video(
-    target_hash, replacement_image, OUTPUT_VIDEO_PATH_VIDEO, INPUT_VIDEO_PATH
+    target_hash, replacement_image, INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO
 ):
+    import cv2
+    from PIL import Image
+    import imagehash
+
     # Open the video file
     cap = cv2.VideoCapture(INPUT_VIDEO_PATH)
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -37,22 +35,3 @@ def process_video(
     cap.release()
     out.release()
     cv2.destroyAllWindows()
-
-
-def video_image_replace(
-    target_image_hashed,
-    replacement_image,
-    INPUT_VIDEO_PATH: str,
-    OUTPUT_VIDEO_PATH_VIDEO: str,
-    OUTPUT_VIDEO_PATH_FINAL: str,
-):
-    process_video(
-        target_image_hashed,
-        replacement_image,
-        OUTPUT_VIDEO_PATH_VIDEO,
-        INPUT_VIDEO_PATH,
-    )
-    out_path = save_video(
-        INPUT_VIDEO_PATH, OUTPUT_VIDEO_PATH_VIDEO, OUTPUT_VIDEO_PATH_FINAL
-    )
-    print("Processing complete! Final video saved as", out_path)
