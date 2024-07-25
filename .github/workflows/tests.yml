@@ -1,6 +1,5 @@
-# 
-name : tests
-run-name :  i'm over here running tests i got tests on my dick fr im a freak fr man
+name : test video image replace
+run-name :  running test for python video replace image from video script
 on : [push]
 
 jobs:
