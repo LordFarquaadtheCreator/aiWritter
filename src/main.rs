@@ -2,7 +2,7 @@ use futures::future::try_join_all;
 
 mod bi;
 mod get_has;
-use bi::prune_characters;
+// use bi::prune_characters;
 use bi::GPTPrompt;
 
 mod gpt_prompt;
@@ -13,6 +13,7 @@ use wordpress::find_tag;
 use wordpress::post;
 // use wordpress::post_image;
 use std::error::Error;
+use clap::Parser;
 
 // mod post_to_insta;
 // use post_to_insta::post_to_insta;
@@ -20,17 +21,25 @@ use std::error::Error;
 // mod get_hashtags;
 // use get_hashtags::ask_website;
 
+/// Simple program to greet a person
+#[derive(Parser, Debug)]
+struct Args {
+    #[arg(short, long, default_value = "email.txt")]
+    path: String,
+
+    #[arg(short, long, default_value = "gpt_prompt.txt")]
+    prompt: String
+}
+
+
 #[tokio::main]
-async fn main (){
-    let debug: bool = false;
-    if(debug){
-        // run your function
-        let v: Vec<String> = vec!["Hi&".to_string(), "ds".to_string()];
-        println!("{}", prune_characters(v).concat());
-    }
+async fn main() {
+    let args: Args = Args::parse();
+    let email_path: String = args.path;
+    let prompt: String = args.prompt;
 
     // create post text
-    let content_result: Result<GPTPrompt, Box<dyn Error>> = gpt_prompt().await;
+    let content_result: Result<GPTPrompt, Box<dyn Error>> = gpt_prompt(email_path, prompt).await;
     let content: GPTPrompt = match content_result {
         Ok(content) => content,
         Err(err) => {
@@ -41,25 +50,28 @@ async fn main (){
 
     // prune invalid characters from tags
 
-
     // case: content body has invalid characters - i manually fixed it
     // let content: String = read_file_to_string("gpt_response_formatted.json").await.unwrap();
     // let content: GPTPrompt = serde_json::from_str(&content).unwrap();
 
     // iteratively create & store tags to be used in post
-    // this can be more efficient - batches 
-    let tag_futures: Vec<_> = content.tags.iter().map(|tag: &String| async {
-        let tag_result = find_tag(tag.to_string()).await;
-        
-        let tag_id: i64 = match tag_result {
-            Ok(id) => id,
-            Err(err) => {
-                eprintln!("Error: {}", err);
-                return Err(err);
-            }
-        };
-        Ok(tag_id)
-    }).collect();
+    // this can be more efficient - batches
+    let tag_futures: Vec<_> = content
+        .tags
+        .iter()
+        .map(|tag: &String| async {
+            let tag_result = find_tag(tag.to_string()).await;
+
+            let tag_id: i64 = match tag_result {
+                Ok(id) => id,
+                Err(err) => {
+                    eprintln!("Error: {}", err);
+                    return Err(err);
+                }
+            };
+            Ok(tag_id)
+        })
+        .collect();
 
     let tags: Result<Vec<i64>, Box<dyn Error>> = try_join_all(tag_futures).await;
     let tags: Vec<i64> = match tags {
@@ -91,14 +103,16 @@ async fn main (){
             return;
         }
     };
-    if (200..400).contains(&post) {println!("Success!");} 
-    else {println!("Failed to create post");}
+    if (200..400).contains(&post) {
+        println!("Success!");
+    } else {
+        println!("Failed to create post");
+    }
 
-    // // post to instagram
+    // post to instagram
     // let post_result: Result<(), Box<dyn Error>> = post_to_insta("https://cdn.discordapp.com/attachments/1192918386368323757/1193043827250954303/Instagram_Post14.png?ex=65ab47a6&is=6598d2a6&hm=893c6addad3f5bec062e3454f48ba87396e2171d7307c9a34dd0dc2fdd3b6116&".to_string(), "hi hi &^*(".to_string()).await;
     // match post_result {
     //     Ok(_) => println!("Success!"),
     //     Err(err) => eprintln!("Error: {}", err),
     // }
-
 }
