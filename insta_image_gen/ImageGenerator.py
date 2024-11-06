@@ -33,11 +33,15 @@ class ImageGenerator:
         new_height = (width * scale_factor, height * scale_factor)
         
         scaled_up_image = self.image.resize(new_height)
-        self.image = scaled_up_image.resize(self.dimensions)
+        self.image = scaled_up_image.crop(0, 0, *self.dimensions)
 
 
     def create_background(self):
-        pass
+        from PIL import ImageFilter
+
+        blur = ImageFilter.GaussianBlur(10)
+        self.background_image = self.image.filter(blur)
+
     def create_text(self):
         pass
     def create_text_background(self):
