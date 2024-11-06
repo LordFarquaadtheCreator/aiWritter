@@ -2,14 +2,15 @@ from PIL import Image, ImageDraw
 import os
 class ImageGenerator:
     def __init__(self, image_path: str) -> None:
-        self.curr_dirr = os.path.join(os.getcwd(), "aiWritter/insta_image_gen")
-        self.logo_path = os.path.join(self.curr_dirr, "test_assets/image.png")
+        self.curr_dirr = "/Users/fahadfaruqi/aiWritter/insta_image_gen"
+        self.logo_path = os.path.join(self.curr_dirr, "test_assets/logo.png")
+
         if not os.path.exists(self.logo_path):
             raise Exception("Logo missing (name 'logo') from test_assets directory")
         if not os.path.exists(image_path):
             raise Exception("Cannot find image")
         
-        self.image = Image.open(image_path)
+        self.image = Image.open(image_path, mode = "r")
         self.logo = Image.open(self.logo_path)
         self.background_image = None
         self.text_background = None
@@ -24,16 +25,16 @@ class ImageGenerator:
         crop it at dimension size
         '''
         width, height = self.image.size # assumption
-        scale_factor = 1
 
+        scale_factor = 1
         if width > height:
             scale_factor = self.dimensions[0] / height
-        if height < width:
+        elif height > width:
             scale_factor = self.dimensions[0] / width
-        new_height = (width * scale_factor, height * scale_factor)
-        
+
+        new_height = (int(width * scale_factor), int(height * scale_factor))
         scaled_up_image = self.image.resize(new_height)
-        self.image = scaled_up_image.crop(0, 0, *self.dimensions)
+        self.image = scaled_up_image.crop((0, 0, *self.dimensions))
 
 
     def create_background(self):
