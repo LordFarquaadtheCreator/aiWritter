@@ -48,13 +48,10 @@ class ImageGenerator:
     def create_text_background(self):
         pass
     def crop_main_image(self):
-        pass
+        new_dims = (int(self.dimensions[0] * 0.75), int(self.dimensions[1] * 0.75))
+        self.main_image = self.image.resize(new_dims)
+
     def add_logo(self):
         pass
     def save(self, path: str = "~/Downloads/insta.png"):
         self.image.save(path)
-
-
-if __name__ == "__main__":
-    image_path = os.path.join(os.curdir(), "test_assets/image.png")
-    c = ImageGenerator(image_path)

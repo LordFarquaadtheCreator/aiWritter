@@ -22,8 +22,13 @@ class Test:
         self.image.create_background()
         print("Blur Test Passed")
 
+    def crop_main_image(self):
+        self.image.crop_main_image()
+        print("Crop main image test passed!")
+
 
 if __name__ == "__main__":
     t = Test()
     t.is_square()
     t.blur()
+    t.crop_main_image()
