@@ -44,8 +44,9 @@ function parseHTML(html: string): string {
  * @param data string
  */
 function pbcopy(data: String) {
+  const intro: string = "Yeah we did that! Check this out and more with the link in bio!\n.\n.\n.\n.\n";
   const proc = spawn("pbcopy");
-  proc.stdin.write(data); 
+  proc.stdin.write(intro + data); 
   proc.stdin.end();
 }
 
