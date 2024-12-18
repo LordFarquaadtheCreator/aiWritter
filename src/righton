@@ -1,0 +1,6 @@
+#/bin/bash
+
+pbpaste > email.txt
+./aiWritter
+pbcopy < /dev/null
+rm email.txt
