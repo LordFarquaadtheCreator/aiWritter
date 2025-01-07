@@ -9,4 +9,3 @@
 - [ ] test the recursive inputs
 - [ ] add righton logo at end
 - [ ] write README
-- [ ] implement as a proper cli
