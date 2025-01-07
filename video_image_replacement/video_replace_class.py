@@ -2,8 +2,8 @@ class video_replace:
     def __init__(self, path: str, time: int):
         from get_first_frame import get_frame_from_video
 
-        self.OUTPUT_VIDEO_PATH_VIDEO = "assets/edited_video.mp4"
-        self.OUTPUT_VIDEO_PATH_FINAL = "../../Downloads/processed_final.mp4"
+        self.OUTPUT_VIDEO_PATH_VIDEO = "assets/edited_video.mp4"  # root?
+        self.OUTPUT_VIDEO_PATH_FINAL = "../../Downloads/processed_final.mp4"  # root?
         self.video_path = path
         self.time_seconds = time
         self.shape, self.frame_to_delete = get_frame_from_video(

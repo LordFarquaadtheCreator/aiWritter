@@ -7,5 +7,6 @@
 - [ ] open the final edited video at process end
 - [ ] input custom picture
 - [ ] test the recursive inputs
+- [ ] add righton logo at end
 - [ ] write README
 - [ ] implement as a proper cli
